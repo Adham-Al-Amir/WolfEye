@@ -58,10 +58,10 @@ class WolfEyeDataService {
     // Second: Initialize Firebase Web SDK for real-time WebSocket listeners
     this.initFirebaseSDK();
 
-    // Third: Keep periodic REST sync (every 3 seconds) as backup heartbeat
+    // Third: Keep periodic REST sync (every 2 seconds) as backup heartbeat — matches Arduino update rate
     this.pollInterval = setInterval(() => {
       this.pollRealFirestoreLiveStatus();
-    }, 3000);
+    }, 2000);
   }
 
   /* --------------------------------------------------------------------------
@@ -81,12 +81,13 @@ class WolfEyeDataService {
       console.log("[WolfEye Cloud] Firebase Firestore SDK initialized successfully.");
 
       // Subscribe to Live Document: classroom/live_status
-      this.db.collection("classroom").document("live_status")
+      this.db.collection("classroom").doc("live_status")
         .onSnapshot((doc) => {
           if (doc.exists) {
             const data = doc.data();
             this.handleLiveStatusData(data);
             this.setConnectedState("FIRESTORE_LIVE");
+            console.log("[WolfEye Cloud] ✅ Live status updated via real-time snapshot.");
           }
         }, (err) => {
           console.warn("[WolfEye Cloud] Live snapshot error (relying on REST):", err.message);
