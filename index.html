@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WolfEye // Tactical Command & AI Classroom Intelligence</title>
+  
+  <!-- Favicon using WolfEye Logo -->
+  <link rel="icon" type="image/png" href="assets/wolfeye_logo.png">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800;900&family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/animations.css">
+
+  <!-- Chart.js CDN for Analytics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <!-- Firebase Web SDK (v9/v10 Compat) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+  <!-- ========================================================================
+       1. SPLASH SCREEN (Wolfteam Aesthetics & Boot Sequence)
+       ======================================================================== -->
+  <div id="splashScreen">
+    <div class="iris-shutter"></div>
+
+    <div class="splash-bg-decor">
+      <div class="splash-hazard-strip-top"></div>
+      <div class="splash-hazard-strip-bottom"></div>
+    </div>
+
+    <div class="splash-container">
+      <!-- Mechanical Iris Logo Stage -->
+      <div class="splash-logo-stage">
+        <div class="hud-ring-outer"></div>
+        <div class="hud-ring-middle"></div>
+        <div class="hud-ring-aperture"></div>
+        <div class="hud-crosshair"></div>
+        <img src="assets/wolfeye_logo.png" alt="WolfEye Logo" class="splash-logo-img" id="splashLogoImg">
+      </div>
+
+      <!-- Title & Branding -->
+      <div class="splash-title-wrap">
+        <h1 class="splash-title glitch-hover">WOLFEYE</h1>
+        <p class="splash-tagline">AI TACTICAL OCCUPANCY &amp; AUTOMATION SYSTEM <span>// v2.4</span></p>
+      </div>
+
+      <!-- Boot Sequence Terminal -->
+      <div class="splash-terminal" id="splashTerminal">
+        <!-- Terminal lines populated dynamically by app.js -->
+      </div>
+
+      <!-- High-Tech Progress Bar -->
+      <div class="splash-progress-wrap">
+        <div class="splash-progress-bar">
+          <div class="splash-progress-fill" id="splashFill"></div>
+        </div>
+        <div class="splash-progress-meta">
+          <span>SYSTEM SYNCHRONIZATION</span>
+          <span id="splashPercent">0%</span>
+        </div>
+      </div>
+
+      <!-- Action Button -->
+      <button class="btn-tactical" id="btnEnterSystem" style="display: none;">
+        <span>ENGAGE COMMAND CENTER</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       2. MAIN APPLICATION DASHBOARD
+       ======================================================================== -->
+  <div id="mainApp">
+
+    <!-- TOP HEADER -->
+    <header class="top-header">
+      <a href="#" class="header-brand">
+        <div class="brand-logo-wrap">
+          <img src="assets/wolfeye_logo.png" alt="WolfEye Logo" class="brand-logo-img">
+        </div>
+        <div class="brand-text">
+          <h1>WOLFEYE</h1>
+          <div class="brand-sub">TACTICAL AI VISION &amp; AUTOMATION</div>
+        </div>
+      </a>
+
+      <!-- Center Status Ticker -->
+      <div class="header-status-ticker">
+        <div class="ticker-item">
+          <span class="ticker-label">TARGETS:</span>
+          <span class="ticker-val" id="tickerOccupancy">0 TARGETS</span>
+        </div>
+        <div class="ticker-item">
+          <span class="ticker-label">THERMAL:</span>
+          <span class="ticker-val" id="tickerTemp">24.5°C</span>
+        </div>
+        <div class="ticker-item">
+          <span class="ticker-label">AI MODEL:</span>
+          <span class="ticker-val" style="color:var(--cyber-cyan);">YOLO11-N</span>
+        </div>
+      </div>
+
+      <!-- Header Controls Right -->
+      <div class="header-controls">
+        <div class="firebase-pill" id="btnFirebaseStatus" title="Firebase Firestore Connection Status">
+          <span class="live-pulse-dot"></span>
+          <span id="firebaseStatusText">FIREBASE ONLINE</span>
+        </div>
+
+        <button class="icon-btn" id="btnToggleSound" title="Toggle Sound FX">
+          <svg id="soundIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+          </svg>
+        </button>
+
+        <button class="icon-btn" id="btnFullscreen" title="Fullscreen Mode">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+          </svg>
+        </button>
+
+        <div class="system-clock" id="liveClock">00:00:00 UTC</div>
+      </div>
+    </header>
+
+    <!-- TACTICAL NAVIGATION MENU BAR (Requested) -->
+    <nav class="tactical-navbar">
+      <div class="nav-tabs-group">
+        <button class="nav-tab-btn active" data-tab="live">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          <span>LIVE STATUS (دواير المراقبة)</span>
+        </button>
+
+        <button class="nav-tab-btn" data-tab="logs">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10 9 9 9 8 9"></polyline>
+          </svg>
+          <span>MONITORING LOGS (سجلات كل 3د)</span>
+        </button>
+
+        <button class="nav-tab-btn" data-tab="alerts">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+            <line x1="12" y1="9" x2="12" y2="13"></line>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+          <span>ALERTS (الإنذارات)</span>
+          <span class="nav-badge zero" id="alertsBadgeNav">0</span>
+        </button>
+
+        <button class="nav-tab-btn" data-tab="analytics">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="20" x2="18" y2="10"></line>
+            <line x1="12" y1="20" x2="12" y2="4"></line>
+            <line x1="6" y1="20" x2="6" y2="14"></line>
+          </svg>
+          <span>AI &amp; ENERGY ANALYTICS</span>
+        </button>
+      </div>
+
+      <!-- Quick Action Simulation Buttons -->
+      <div class="nav-quick-actions">
+        <button class="btn-tactical-sm" id="btnSimGasAlert" title="Test MQ-5 Gas Alert Trigger">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+          </svg>
+          <span>TEST GAS ALERT</span>
+        </button>
+        <button class="btn-tactical-sm" id="btnSimTempAlert" title="Test High Temp (48.5°C) Alert">
+          <span>TEST TEMP ALERT</span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- MAIN VIEWPORT -->
+    <main class="main-viewport">
+
+      <!-- ====================================================================
+           TAB 1: LIVE STATUS (The Circular HUD Meters)
+           ==================================================================== -->
+      <section class="tab-pane active" id="tab-live">
+        <div class="section-header-row">
+          <div>
+            <h2 class="section-title"><span>01 //</span> LIVE TELEMETRY &amp; GAUGES</h2>
+            <p class="section-desc">Real-time sensor feed synced from Arduino (COM5) &amp; YOLO11 AI vision tracker.</p>
+          </div>
+          <div style="font-family:var(--font-hud); font-size:0.75rem; color:var(--wolf-yellow);">
+            SYNC INTERVAL: 2 SECONDS
+          </div>
+        </div>
+
+        <!-- 4 Core Circular HUD Gauges (Requested by User) -->
+        <div class="gauges-grid">
+
+          <!-- 1. people_count Gauge -->
+          <div class="tactical-card">
+            <div class="card-top-meta">
+              <span class="card-hud-code">[ METRIC_01 ]</span>
+              <span class="card-status-badge badge-normal" id="badgePeopleStatus">OPTIMAL</span>
+            </div>
+            <div class="gauge-wrapper">
+              <svg class="gauge-svg" viewBox="0 0 160 160">
+                <circle class="gauge-bg-circle" cx="80" cy="80" r="70"></circle>
+                <circle class="gauge-fill-circle" id="gaugePeopleCircle" cx="80" cy="80" r="70"></circle>
+              </svg>
+              <div class="gauge-center-content">
+                <div class="gauge-main-val" id="gaugePeopleCount">0</div>
+                <div class="gauge-unit">STUDENTS</div>
+              </div>
+            </div>
+            <div class="card-footer-info">
+              <div class="card-title">PEOPLE COUNT</div>
+              <div class="card-subtext">YOLO11 ByteTrack Detection in ROI zone</div>
+            </div>
+          </div>
+
+          <!-- 2. led_is_on Gauge -->
+          <div class="tactical-card">
+            <div class="card-top-meta">
+              <span class="card-hud-code">[ ACTUATOR_02 ]</span>
+              <span class="card-status-badge badge-warning" id="badgeLedStatus">ACTIVE</span>
+            </div>
+            <div class="gauge-wrapper">
+              <svg class="gauge-svg" viewBox="0 0 160 160">
+                <circle class="gauge-bg-circle" cx="80" cy="80" r="70"></circle>
+                <circle class="gauge-fill-circle" id="gaugeLedCircle" cx="80" cy="80" r="70"></circle>
+              </svg>
+              <div class="gauge-center-content">
+                <div class="gauge-main-val" id="gaugeLedState">ON</div>
+                <div class="gauge-unit">SMART LIGHT</div>
+              </div>
+            </div>
+            <div class="card-footer-info">
+              <div class="card-title">LIGHTING AUTOMATION</div>
+              <div class="energy-tracker-box">
+                <div class="energy-item">ON TIME: <strong id="gaugeLedSeconds">0s</strong></div>
+                <div class="energy-item">SAVED: <strong id="statEnergySaved">0.00 kWh</strong></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. temperature_c Gauge -->
+          <div class="tactical-card">
+            <div class="card-top-meta">
+              <span class="card-hud-code">[ SENSOR_03 ]</span>
+              <span class="card-status-badge badge-normal" id="badgeTempStatus">NORMAL</span>
+            </div>
+            <div class="gauge-wrapper">
+              <svg class="gauge-svg" viewBox="0 0 160 160">
+                <circle class="gauge-bg-circle" cx="80" cy="80" r="70"></circle>
+                <circle class="gauge-fill-circle cyan" id="gaugeTempCircle" cx="80" cy="80" r="70"></circle>
+              </svg>
+              <div class="gauge-center-content">
+                <div class="gauge-main-val" id="gaugeTempValue">24.5</div>
+                <div class="gauge-unit">°C TEMP</div>
+              </div>
+            </div>
+            <div class="card-footer-info">
+              <div class="card-title">TEMPERATURE (LM35)</div>
+              <div class="card-subtext">Hazard Threshold: &ge; 45.0 °C (Pin A0)</div>
+            </div>
+          </div>
+
+          <!-- 4. gas_detected Gauge -->
+          <div class="tactical-card">
+            <div class="card-top-meta">
+              <span class="card-hud-code">[ SAFETY_04 ]</span>
+              <span class="card-status-badge badge-normal" id="badgeGasStatus">AIR SAFE</span>
+            </div>
+            <div class="gauge-wrapper">
+              <svg class="gauge-svg" viewBox="0 0 160 160">
+                <circle class="gauge-bg-circle" cx="80" cy="80" r="70"></circle>
+                <circle class="gauge-fill-circle success" id="gaugeGasCircle" cx="80" cy="80" r="70"></circle>
+              </svg>
+              <div class="gauge-center-content">
+                <div class="gauge-main-val" id="gaugeGasValue">0</div>
+                <div class="gauge-unit">MQ-5 STATUS</div>
+              </div>
+            </div>
+            <div class="card-footer-info">
+              <div class="card-title">GAS LEAK DETECTOR</div>
+              <div class="card-subtext">Digital Pin D4 // Buzzer Pin D3</div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Telemetry & Zone Vision Stream Overview -->
+        <div class="telemetry-row">
+          <!-- Left: AI Vision ROI Tracking Simulation -->
+          <div class="tactical-card vision-status-card">
+            <div class="card-top-meta">
+              <div class="card-title" style="margin:0;">TACTICAL CLASSROOM RADAR // ROI ZONE</div>
+              <span class="card-status-badge badge-normal">BYTE-TRACK ACTIVE</span>
+            </div>
+
+            <div class="vision-stream-mock">
+              <div class="stream-radar-grid"></div>
+              <div class="stream-sweep-radar"></div>
+
+              <div class="stream-hud-overlay">
+                <div>FEED: CAM_01 [640x480]</div>
+                <div>CONF: 0.15 | FPS: 30</div>
+              </div>
+
+              <!-- Animated Simulated Track Targets -->
+              <div class="stream-target-box" style="top: 25%; left: 35%; width: 55px; height: 95px;">
+                <div class="target-tag">ID: 101</div>
+              </div>
+              <div class="stream-target-box" style="top: 35%; left: 60%; width: 50px; height: 90px;">
+                <div class="target-tag">ID: 104</div>
+              </div>
+              <div class="stream-target-box" style="top: 45%; left: 20%; width: 48px; height: 85px;">
+                <div class="target-tag">ID: 109</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Hardware & Connection Parameters Checklist -->
+          <div class="tactical-card">
+            <div class="card-top-meta">
+              <div class="card-title" style="margin:0;">SYSTEM SPECS &amp; ARDUINO</div>
+              <span class="card-status-badge badge-normal">HARDWARE SYNC</span>
+            </div>
+
+            <div class="system-params-list">
+              <div class="param-item">
+                <span class="param-name">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path></svg>
+                  YOLO Model Path
+                </span>
+                <span class="param-val">yolo26n.pt / yolo11n.pt</span>
+              </div>
+              <div class="param-item">
+                <span class="param-name">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
+                  Arduino Serial Port
+                </span>
+                <span class="param-val">COM5 (57600 baud)</span>
+              </div>
+              <div class="param-item">
+                <span class="param-name">Empty Delay Shutoff</span>
+                <span class="param-val">10 Seconds</span>
+              </div>
+              <div class="param-item">
+                <span class="param-name">3-Min History Interval</span>
+                <span class="param-val">180s (monitoring_logs)</span>
+              </div>
+              <div class="param-item">
+                <span class="param-name">Firebase Firestore ID</span>
+                <span class="param-val" style="color:var(--cyber-cyan);">wolfeye-eff54</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           TAB 2: MONITORING LOGS HISTORY (Every 3-Minutes Synced)
+           ==================================================================== -->
+      <section class="tab-pane" id="tab-logs">
+        <div class="section-header-row">
+          <div>
+            <h2 class="section-title"><span>02 //</span> MONITORING LOGS HISTORY (3-MIN SYNC)</h2>
+            <p class="section-desc">Periodic classroom telemetry records collected every 3 minutes (180 seconds) from MySQL / Firestore table.</p>
+          </div>
+          <div style="display:flex; gap:10px;">
+            <button class="btn-tactical-sm" id="btnAddManualLog">+ ADD LOG ENTRY NOW</button>
+          </div>
+        </div>
+
+        <!-- Controls, Filters & Search -->
+        <div class="table-controls-bar">
+          <div class="table-search-box">
+            <svg class="table-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" class="table-search-input" id="logsSearchInput" placeholder="Search by ID, Count, or Temp...">
+          </div>
+
+          <div class="table-filter-group">
+            <select class="table-select" id="filterLedState">
+              <option value="all">Lighting: All States</option>
+              <option value="on">Lighting: ON Only</option>
+              <option value="off">Lighting: OFF Only</option>
+            </select>
+
+            <button class="btn-tactical-sm" id="btnExportCsv">EXPORT CSV</button>
+            <button class="btn-tactical-sm" id="btnExportJson">EXPORT JSON</button>
+          </div>
+        </div>
+
+        <!-- The Logs Table -->
+        <div class="table-responsive">
+          <table class="tactical-table">
+            <thead>
+              <tr>
+                <th>LOG ID</th>
+                <th>TIMESTAMP</th>
+                <th>PEOPLE COUNT</th>
+                <th>LED IS ON</th>
+                <th>LED RUNTIME</th>
+                <th>TEMPERATURE</th>
+                <th>GAS DETECTED</th>
+              </tr>
+            </thead>
+            <tbody id="logsTableBody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+
+          <div class="table-footer">
+            <div id="logsTotalCount">0 Records</div>
+            <div class="pagination-controls">
+              <button class="page-btn" id="btnPrevPage" disabled>&laquo; PREV</button>
+              <span id="pageInfo" style="font-family:var(--font-hud); font-size:0.75rem; color:var(--wolf-yellow);">Page 1 of 1</span>
+              <button class="page-btn" id="btnNextPage">&raquo; NEXT</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           TAB 3: HAZARD & SAFETY ALERTS TABLE
+           ==================================================================== -->
+      <section class="tab-pane" id="tab-alerts">
+        <div class="section-header-row">
+          <div>
+            <h2 class="section-title"><span>03 //</span> HAZARD &amp; SAFETY ALERTS (جدول الإنذارات)</h2>
+            <p class="section-desc">Immediate high-priority triggers for toxic gas leakage (MQ-5) and extreme room heat (&ge; 45°C).</p>
+          </div>
+        </div>
+
+        <!-- Active Alert Banner -->
+        <div class="alerts-top-banner" id="bannerActiveAlerts" style="display:none;">
+          <div class="alerts-banner-info">
+            <h3>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                <line x1="12" y1="9" x2="12" y2="13"></line>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+              </svg>
+              <span>HAZARD ALERT ACTIVE:</span> <span id="activeAlertsCountText">1 ACTIVE HAZARD</span>
+            </h3>
+            <p>Immediate inspection required. Arduino buzzer and safety protocols engaged.</p>
+          </div>
+          <div>
+            <button class="btn-tactical-sm" style="background:var(--danger-red); color:#fff; border-color:var(--danger-red);" onclick="window.wolfEyeData.alerts.forEach(a => window.resolveAlertById(a.id))">
+              ACKNOWLEDGE ALL
+            </button>
+          </div>
+        </div>
+
+        <!-- Alerts Table -->
+        <div class="table-responsive">
+          <table class="tactical-table">
+            <thead>
+              <tr>
+                <th>ALERT ID</th>
+                <th>ALERT TYPE</th>
+                <th>SEVERITY</th>
+                <th>MEASURED VALUE</th>
+                <th>TRIGGERED AT</th>
+                <th>ACTION</th>
+              </tr>
+            </thead>
+            <tbody id="alertsTableBody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           TAB 4: AI & ENERGY ANALYTICS
+           ==================================================================== -->
+      <section class="tab-pane" id="tab-analytics">
+        <div class="section-header-row">
+          <div>
+            <h2 class="section-title"><span>04 //</span> AI &amp; ENERGY ANALYTICS</h2>
+            <p class="section-desc">Occupancy trends, thermal gradients, and automated power saving insights.</p>
+          </div>
+        </div>
+
+        <div class="charts-grid">
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <span class="chart-card-title">STUDENTS OCCUPANCY (YOLO11)</span>
+              <span style="font-size:0.75rem; color:#718096;">PAST 36 MINS (3-MIN INTERVALS)</span>
+            </div>
+            <div class="chart-container-inner">
+              <canvas id="occupancyChartCanvas"></canvas>
+            </div>
+          </div>
+
+          <div class="chart-card">
+            <div class="chart-card-header">
+              <span class="chart-card-title">THERMAL GRADIENT (LM35 SENSOR)</span>
+              <span style="font-size:0.75rem; color:#718096;">AMBIENT TEMPERATURE (°C)</span>
+            </div>
+            <div class="chart-container-inner">
+              <canvas id="thermalChartCanvas"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="tactical-footer">
+      <div class="footer-brand">WOLFEYE // AI CLASSROOM OS &bull; WOLFTEAM THEME</div>
+      <div class="footer-links">
+        <a href="javascript:void(0)" onclick="document.querySelector('[data-tab=live]').click()">Live HUD</a>
+        <a href="javascript:void(0)" onclick="document.querySelector('[data-tab=logs]').click()">Monitoring Logs</a>
+        <a href="javascript:void(0)" onclick="document.querySelector('[data-tab=alerts]').click()">Alerts</a>
+        <a href="javascript:void(0)" onclick="document.getElementById('modalFirebase').classList.add('open')">Firebase Config</a>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- ========================================================================
+       FIREBASE CONFIG & CLOUD MODAL
+       ======================================================================== -->
+  <div class="tactical-modal-backdrop" id="modalFirebase">
+    <div class="tactical-modal-window">
+      <div class="modal-header">
+        <div class="modal-title">[ FIREBASE FIRESTORE SYNC ]</div>
+        <button class="modal-close-btn" id="btnCloseModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p style="color:#a0aec0; font-size:0.88rem; margin-bottom:16px;">
+          WolfEye connects to Google Cloud Firebase Firestore to stream real-time telemetry from <code style="color:var(--wolf-yellow)">tracker.py</code> and <code style="color:var(--wolf-yellow)">database.py</code>.
+        </p>
+
+        <div class="modal-form-group">
+          <label class="modal-form-label">PROJECT ID</label>
+          <input type="text" class="modal-input" value="wolfeye-eff54" readonly>
+        </div>
+
+        <div class="modal-form-group">
+          <label class="modal-form-label">COLLECTIONS &amp; DOCS</label>
+          <input type="text" class="modal-input" value="classroom/live_status &bull; monitoring_logs &bull; alerts" readonly>
+        </div>
+
+        <div class="modal-form-group">
+          <label class="modal-form-label">FIREBASE WEB API KEY (OPTIONAL FOR CLOUD REALTIME)</label>
+          <input type="password" class="modal-input" id="inputFirebaseApiKey" placeholder="AIzaSy... (leave blank for built-in simulation)">
+        </div>
+
+        <p style="font-size:0.75rem; color:#718096; line-height:1.4;">
+          * Note: When running without an active Firebase Web key, WolfEye automatically operates in High-Fidelity Simulation Mode so you can demonstrate the entire dashboard with live sensor jitter, 3-minute logging, and test alerts.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-tactical-sm" id="btnSaveFirebaseKey">SAVE &amp; RECONNECT</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Application Logic Scripts -->
+  <script src="js/sound-effects.js"></script>
+  <script src="js/firebase-app.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

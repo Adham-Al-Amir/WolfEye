@@ -1,0 +1,163 @@
+/* ==============================================================================
+   WolfEye - High-Tech Tactical Animations & Transitions
+   ============================================================================== */
+
+/* Rotations for HUD rings */
+@keyframes rotateClockwise {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes rotateCounterClockwise {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(-360deg); }
+}
+
+/* Splash Logo Breathing Glow */
+@keyframes logoBreathing {
+  0% {
+    transform: scale(0.97);
+    filter: drop-shadow(0 0 15px rgba(255, 208, 0, 0.5));
+  }
+  50% {
+    transform: scale(1.03);
+    filter: drop-shadow(0 0 35px rgba(255, 208, 0, 0.95)) drop-shadow(0 0 60px rgba(255, 208, 0, 0.4));
+  }
+  100% {
+    transform: scale(0.97);
+    filter: drop-shadow(0 0 15px rgba(255, 208, 0, 0.5));
+  }
+}
+
+/* Live Status Pulse Dot */
+@keyframes pulseDot {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.9);
+    opacity: 0.6;
+  }
+}
+
+/* Hazard Alarm Pulse */
+@keyframes pulseAlarm {
+  0% {
+    box-shadow: 0 0 5px var(--danger-red);
+    opacity: 0.8;
+  }
+  50% {
+    box-shadow: 0 0 25px var(--danger-red), 0 0 50px rgba(255, 42, 77, 0.6);
+    opacity: 1;
+  }
+  100% {
+    box-shadow: 0 0 5px var(--danger-red);
+    opacity: 0.8;
+  }
+}
+
+/* Radar Sweep */
+@keyframes radarSweep {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Tab Fade In */
+@keyframes fadeInTab {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.99);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Modal Popup */
+@keyframes modalPop {
+  0% {
+    opacity: 0;
+    transform: scale(0.92) translateY(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Shutter Iris Shockwave Animation */
+@keyframes irisShockwave {
+  0% {
+    transform: translate(-50%, -50%) scale(0.1);
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(2.2);
+    opacity: 0;
+  }
+}
+
+.shockwave-active {
+  animation: irisShockwave 0.85s cubic-bezier(0.15, 0.85, 0.35, 1) forwards;
+}
+
+/* Tactical Text Glitch Effect on Title Hover */
+.glitch-hover:hover {
+  animation: textGlitch 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+@keyframes textGlitch {
+  0% {
+    transform: translate(0);
+    text-shadow: 0 0 10px rgba(255, 208, 0, 0.8);
+  }
+  20% {
+    transform: translate(-2px, 2px);
+    text-shadow: -2px 0 var(--danger-red), 2px 0 var(--cyber-cyan);
+  }
+  40% {
+    transform: translate(-2px, -2px);
+    text-shadow: 2px 0 var(--danger-red), -2px 0 var(--cyber-cyan);
+  }
+  60% {
+    transform: translate(2px, 2px);
+    text-shadow: -2px 0 var(--wolf-yellow), 2px 0 var(--cyber-cyan);
+  }
+  80% {
+    transform: translate(2px, -2px);
+    text-shadow: 2px 0 var(--danger-red), -2px 0 var(--wolf-yellow);
+  }
+  100% {
+    transform: translate(0);
+    text-shadow: 0 0 10px rgba(255, 208, 0, 0.8);
+  }
+}
+
+/* Shimmer on Buttons and Headers */
+@keyframes tacticalShimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* LED Indicator Glow Pulse */
+.led-glowing-active {
+  animation: ledPulse 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes ledPulse {
+  0% {
+    filter: drop-shadow(0 0 8px rgba(255, 208, 0, 0.6));
+  }
+  100% {
+    filter: drop-shadow(0 0 24px rgba(255, 208, 0, 1)) drop-shadow(0 0 40px rgba(255, 238, 85, 0.8));
+  }
+}

@@ -1,0 +1,1625 @@
+/* ==============================================================================
+   WolfEye - Tactical Command & AI Classroom Intelligence OS
+   Wolfteam Yellow & Black High-Tech Theme
+   ============================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+  /* Wolfteam Color Palette */
+  --bg-darkest: #07080a;
+  --bg-darker: #0d0f14;
+  --bg-card: rgba(18, 21, 28, 0.85);
+  --bg-card-hover: rgba(26, 31, 41, 0.95);
+  --bg-card-solid: #12151c;
+  
+  /* Tactical Wolf Yellow Accents */
+  --wolf-yellow: #ffd000;
+  --wolf-yellow-glow: rgba(255, 208, 0, 0.4);
+  --wolf-yellow-muted: #b89600;
+  --wolf-gold: #ffbe0b;
+  --wolf-gold-bright: #ffee55;
+  --wolf-dark-yellow: #3d3400;
+
+  /* Tactical Accents */
+  --cyber-cyan: #00f0ff;
+  --cyber-cyan-glow: rgba(0, 240, 255, 0.35);
+  --danger-red: #ff2a4d;
+  --danger-red-glow: rgba(255, 42, 77, 0.45);
+  --success-green: #00ff88;
+  --success-green-glow: rgba(0, 255, 136, 0.35);
+  --warning-amber: #ff9500;
+  
+  /* Borders and Grids */
+  --border-tactical: rgba(255, 208, 0, 0.25);
+  --border-tactical-bright: rgba(255, 208, 0, 0.65);
+  --border-dark: rgba(255, 255, 255, 0.08);
+
+  /* Fonts */
+  --font-hud: 'Orbitron', -apple-system, sans-serif;
+  --font-tactical: 'Rajdhani', -apple-system, sans-serif;
+  --font-ui: 'Inter', -apple-system, sans-serif;
+
+  /* Transitions */
+  --trans-fast: 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  --trans-smooth: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--bg-darkest);
+  color: #e0e5ec;
+  font-family: var(--font-tactical);
+  font-size: 16px;
+  line-height: 1.5;
+  overflow-x: hidden;
+  min-height: 100vh;
+  position: relative;
+  letter-spacing: 0.5px;
+  user-select: none;
+}
+
+/* Tactical Background Grid & Vignette */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-image: 
+    radial-gradient(circle at 50% 20%, rgba(255, 208, 0, 0.05) 0%, transparent 60%),
+    linear-gradient(rgba(255, 208, 0, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 208, 0, 0.03) 1px, transparent 1px);
+  background-size: 100% 100%, 40px 40px, 40px 40px;
+  background-position: 0 0, -1px -1px, -1px -1px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Subtle Tactical Scanlines */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.15) 0px,
+    rgba(0, 0, 0, 0.15) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.6;
+}
+
+/* ==============================================================================
+   SPLASH SCREEN (Wolfteam Aesthetics & Boot Sequence)
+   ============================================================================== */
+#splashScreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: radial-gradient(circle at center, #151821 0%, #07080a 80%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+  transition: opacity 0.8s cubic-bezier(0.7, 0, 0.3, 1), transform 0.8s cubic-bezier(0.7, 0, 0.3, 1);
+  overflow: hidden;
+}
+
+#splashScreen.unlocked {
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(1.12);
+  filter: blur(8px);
+}
+
+/* Shutter Iris overlay during unlock transition */
+.iris-shutter {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  width: 150vmax;
+  height: 150vmax;
+  border-radius: 50%;
+  background: radial-gradient(circle, transparent 30%, var(--wolf-yellow) 45%, #000 70%);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 10005;
+  transition: transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.6s ease-in-out;
+}
+
+#splashScreen.unlocked .iris-shutter {
+  transform: translate(-50%, -50%) scale(1.5);
+  opacity: 1;
+}
+
+/* Splash Hex Background Decor */
+.splash-bg-decor {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.splash-hazard-strip-top,
+.splash-hazard-strip-bottom {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 6px;
+  background: repeating-linear-gradient(
+    45deg,
+    var(--wolf-yellow),
+    var(--wolf-yellow) 15px,
+    #000 15px,
+    #000 30px
+  );
+  box-shadow: 0 0 15px var(--wolf-yellow);
+}
+
+.splash-hazard-strip-top { top: 0; }
+.splash-hazard-strip-bottom { bottom: 0; }
+
+.splash-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+  max-width: 720px;
+  width: 90%;
+  text-align: center;
+}
+
+/* WolfEye Mechanical Iris Container */
+.splash-logo-stage {
+  position: relative;
+  width: 280px;
+  height: 280px;
+  margin-bottom: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Rotating Mechanical HUD Rings around Logo */
+.hud-ring-outer {
+  position: absolute;
+  width: 270px;
+  height: 270px;
+  border: 2px dashed rgba(255, 208, 0, 0.35);
+  border-radius: 50%;
+  animation: rotateClockwise 25s linear infinite;
+}
+
+.hud-ring-middle {
+  position: absolute;
+  width: 230px;
+  height: 230px;
+  border: 1px solid rgba(255, 208, 0, 0.2);
+  border-left: 3px solid var(--wolf-yellow);
+  border-right: 3px solid var(--wolf-yellow);
+  border-radius: 50%;
+  animation: rotateCounterClockwise 15s linear infinite;
+  box-shadow: 0 0 25px rgba(255, 208, 0, 0.2);
+}
+
+.hud-ring-aperture {
+  position: absolute;
+  width: 180px;
+  height: 180px;
+  border: 2px dotted rgba(255, 208, 0, 0.5);
+  border-radius: 50%;
+  animation: rotateClockwise 8s linear infinite;
+}
+
+/* Crosshair overlay */
+.hud-crosshair {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.hud-crosshair::before,
+.hud-crosshair::after {
+  content: '';
+  position: absolute;
+  background: rgba(255, 208, 0, 0.4);
+}
+
+.hud-crosshair::before {
+  top: 50%;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+}
+
+.hud-crosshair::after {
+  left: 50%;
+  top: 10%;
+  bottom: 10%;
+  width: 1px;
+}
+
+/* Splash WolfEye Logo */
+.splash-logo-img {
+  position: relative;
+  width: 200px;
+  height: auto;
+  z-index: 5;
+  filter: drop-shadow(0 0 25px rgba(255, 208, 0, 0.75));
+  animation: logoBreathing 3s ease-in-out infinite alternate;
+  cursor: pointer;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.splash-logo-img:hover {
+  transform: scale(1.08);
+  filter: drop-shadow(0 0 35px rgba(255, 208, 0, 0.95));
+}
+
+/* WolfEye Title and Subtitles */
+.splash-title-wrap {
+  margin-bottom: 20px;
+}
+
+.splash-title {
+  font-family: var(--font-hud);
+  font-size: 3.2rem;
+  font-weight: 900;
+  letter-spacing: 12px;
+  color: var(--wolf-yellow);
+  text-transform: uppercase;
+  text-shadow: 
+    0 0 10px rgba(255, 208, 0, 0.8),
+    0 0 30px rgba(255, 208, 0, 0.5),
+    0 0 60px rgba(255, 208, 0, 0.3);
+  position: relative;
+  display: inline-block;
+}
+
+.splash-tagline {
+  font-family: var(--font-tactical);
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: 4px;
+  color: #a0aec0;
+  text-transform: uppercase;
+  margin-top: 5px;
+}
+
+.splash-tagline span {
+  color: var(--wolf-yellow);
+}
+
+/* Boot Terminal Log */
+.splash-terminal {
+  background: rgba(10, 12, 16, 0.85);
+  border: 1px solid var(--border-tactical);
+  border-left: 4px solid var(--wolf-yellow);
+  padding: 12px 20px;
+  border-radius: 4px;
+  width: 100%;
+  max-width: 540px;
+  margin-bottom: 25px;
+  font-family: monospace;
+  font-size: 0.88rem;
+  color: #718096;
+  text-align: left;
+  min-height: 85px;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
+}
+
+.terminal-line {
+  margin: 3px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.terminal-line .t-prefix {
+  color: var(--wolf-yellow);
+  font-weight: bold;
+}
+
+.terminal-line .t-ok {
+  color: var(--success-green);
+  font-weight: bold;
+}
+
+.terminal-line .t-info {
+  color: #e2e8f0;
+}
+
+/* Splash Progress Bar */
+.splash-progress-wrap {
+  width: 100%;
+  max-width: 540px;
+  margin-bottom: 25px;
+}
+
+.splash-progress-bar {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.splash-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #b89600, var(--wolf-yellow), #ffee55);
+  box-shadow: 0 0 15px var(--wolf-yellow);
+  transition: width 0.2s linear;
+}
+
+.splash-progress-meta {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  font-family: var(--font-hud);
+  font-size: 0.75rem;
+  color: #a0aec0;
+  letter-spacing: 1px;
+}
+
+#splashPercent {
+  color: var(--wolf-yellow);
+  font-weight: 700;
+}
+
+/* Tactical Action Button */
+.btn-tactical {
+  position: relative;
+  background: linear-gradient(135deg, rgba(255, 208, 0, 0.15) 0%, rgba(255, 208, 0, 0.05) 100%);
+  border: 1px solid var(--wolf-yellow);
+  color: var(--wolf-yellow);
+  font-family: var(--font-hud);
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  padding: 14px 38px;
+  cursor: pointer;
+  clip-path: polygon(15px 0%, 100% 0%, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0% 100%, 0% 15px);
+  transition: all var(--trans-fast);
+  box-shadow: 0 0 15px rgba(255, 208, 0, 0.25);
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn-tactical::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s ease;
+}
+
+.btn-tactical:hover {
+  background: var(--wolf-yellow);
+  color: #000;
+  box-shadow: 0 0 30px rgba(255, 208, 0, 0.7);
+  transform: translateY(-2px);
+}
+
+.btn-tactical:hover::before {
+  left: 100%;
+}
+
+.btn-tactical:active {
+  transform: translateY(1px);
+}
+
+/* ==============================================================================
+   MAIN DASHBOARD LAYOUT
+   ============================================================================== */
+#mainApp {
+  opacity: 0;
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 1;
+}
+
+#mainApp.visible {
+  opacity: 1;
+}
+
+/* TOP HEADER */
+.top-header {
+  height: 74px;
+  background: rgba(10, 12, 16, 0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-tactical);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 30px;
+}
+
+.top-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 5%, var(--wolf-yellow) 30%, var(--wolf-yellow) 70%, transparent 95%);
+  box-shadow: 0 0 10px var(--wolf-yellow);
+}
+
+/* Header Brand */
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  text-decoration: none;
+}
+
+.brand-logo-wrap {
+  width: 48px;
+  height: 48px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.brand-logo-img {
+  width: 44px;
+  height: auto;
+  filter: drop-shadow(0 0 8px var(--wolf-yellow));
+  transition: transform var(--trans-fast);
+}
+
+.brand-logo-wrap:hover .brand-logo-img {
+  transform: scale(1.15) rotate(5deg);
+}
+
+.brand-text h1 {
+  font-family: var(--font-hud);
+  font-size: 1.4rem;
+  font-weight: 800;
+  letter-spacing: 4px;
+  color: var(--wolf-yellow);
+  text-transform: uppercase;
+  margin: 0;
+  line-height: 1.1;
+}
+
+.brand-text .brand-sub {
+  font-family: var(--font-tactical);
+  font-size: 0.75rem;
+  letter-spacing: 2px;
+  color: #718096;
+  text-transform: uppercase;
+}
+
+/* Header Status Center */
+.header-status-ticker {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: rgba(18, 21, 28, 0.75);
+  border: 1px solid var(--border-tactical);
+  padding: 6px 18px;
+  border-radius: 4px;
+  clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+}
+
+.ticker-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-hud);
+  font-size: 0.75rem;
+  color: #a0aec0;
+}
+
+.ticker-label {
+  color: #718096;
+}
+
+.ticker-val {
+  color: var(--wolf-yellow);
+  font-weight: 700;
+}
+
+/* Header Controls Right */
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.firebase-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: rgba(0, 255, 136, 0.08);
+  border: 1px solid rgba(0, 255, 136, 0.4);
+  border-radius: 20px;
+  font-family: var(--font-hud);
+  font-size: 0.75rem;
+  color: var(--success-green);
+  cursor: pointer;
+  transition: all var(--trans-fast);
+}
+
+.firebase-pill.offline {
+  background: rgba(255, 42, 77, 0.1);
+  border-color: rgba(255, 42, 77, 0.4);
+  color: var(--danger-red);
+}
+
+.firebase-pill.simulating {
+  background: rgba(255, 208, 0, 0.1);
+  border-color: rgba(255, 208, 0, 0.5);
+  color: var(--wolf-yellow);
+}
+
+.live-pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 10px currentColor;
+  animation: pulseDot 1.6s infinite;
+}
+
+.icon-btn {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #cbd5e0;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all var(--trans-fast);
+}
+
+.icon-btn:hover {
+  background: rgba(255, 208, 0, 0.15);
+  border-color: var(--wolf-yellow);
+  color: var(--wolf-yellow);
+  box-shadow: 0 0 12px var(--wolf-yellow-glow);
+}
+
+.system-clock {
+  font-family: var(--font-hud);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--wolf-yellow);
+  letter-spacing: 1px;
+}
+
+/* ==============================================================================
+   TACTICAL NAVIGATION MENU BAR (Requested Buttons)
+   ============================================================================== */
+.tactical-navbar {
+  background: rgba(13, 15, 20, 0.95);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  padding: 10px 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.nav-tabs-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.nav-tab-btn {
+  background: rgba(20, 24, 32, 0.7);
+  border: 1px solid var(--border-tactical);
+  color: #a0aec0;
+  font-family: var(--font-hud);
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 10px 22px;
+  border-radius: 2px;
+  cursor: pointer;
+  clip-path: polygon(10px 0%, 100% 0%, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0% 100%, 0% 10px);
+  transition: all var(--trans-fast);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+}
+
+.nav-tab-btn svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  transition: transform var(--trans-fast);
+}
+
+.nav-tab-btn:hover {
+  background: rgba(255, 208, 0, 0.12);
+  color: var(--wolf-yellow);
+  border-color: var(--wolf-yellow);
+  box-shadow: 0 0 15px rgba(255, 208, 0, 0.2);
+}
+
+.nav-tab-btn:hover svg {
+  transform: scale(1.1);
+}
+
+.nav-tab-btn.active {
+  background: linear-gradient(135deg, rgba(255, 208, 0, 0.25) 0%, rgba(255, 208, 0, 0.08) 100%);
+  border-color: var(--wolf-yellow);
+  color: var(--wolf-yellow);
+  box-shadow: 0 0 20px rgba(255, 208, 0, 0.35);
+}
+
+.nav-tab-btn.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 15%;
+  right: 15%;
+  height: 3px;
+  background: var(--wolf-yellow);
+  box-shadow: 0 0 8px var(--wolf-yellow);
+}
+
+/* Badge inside nav button (for alert counts) */
+.nav-badge {
+  background: var(--danger-red);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 10px;
+  box-shadow: 0 0 8px var(--danger-red);
+}
+
+.nav-badge.zero {
+  background: #4a5568;
+  box-shadow: none;
+}
+
+/* Quick Tools in Navbar Right */
+.nav-quick-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn-tactical-sm {
+  background: rgba(255, 208, 0, 0.08);
+  border: 1px solid var(--border-tactical);
+  color: var(--wolf-yellow);
+  font-family: var(--font-hud);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  padding: 8px 16px;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: all var(--trans-fast);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-tactical-sm:hover {
+  background: var(--wolf-yellow);
+  color: #000;
+  box-shadow: 0 0 15px var(--wolf-yellow-glow);
+}
+
+/* ==============================================================================
+   MAIN CONTENT & TAB PANELS
+   ============================================================================== */
+.main-viewport {
+  flex: 1;
+  padding: 28px 30px 40px 30px;
+  position: relative;
+  z-index: 2;
+}
+
+.tab-pane {
+  display: none;
+  animation: fadeInTab 0.35s ease-out;
+}
+
+.tab-pane.active {
+  display: block;
+}
+
+/* Section Header Titles */
+.section-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 24px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 208, 0, 0.15);
+  position: relative;
+}
+
+.section-header-row::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 140px;
+  height: 2px;
+  background: var(--wolf-yellow);
+  box-shadow: 0 0 8px var(--wolf-yellow);
+}
+
+.section-title {
+  font-family: var(--font-hud);
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.section-title span {
+  color: var(--wolf-yellow);
+}
+
+.section-desc {
+  font-size: 0.95rem;
+  color: #718096;
+  margin-top: 4px;
+}
+
+/* ==============================================================================
+   LIVE STATUS CIRCULAR GAUGES (Core Requested Feature)
+   ============================================================================== */
+.gauges-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 24px;
+  margin-bottom: 30px;
+}
+
+/* Tactical HUD Card */
+.tactical-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-tactical);
+  border-radius: 4px;
+  padding: 24px 20px;
+  position: relative;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+  transition: transform var(--trans-fast), border-color var(--trans-fast), box-shadow var(--trans-fast);
+  overflow: hidden;
+}
+
+.tactical-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--wolf-yellow);
+  box-shadow: 0 12px 40px rgba(255, 208, 0, 0.15);
+}
+
+/* Tactical Corner Chamfer Accents */
+.tactical-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 16px;
+  height: 16px;
+  background: linear-gradient(135deg, transparent 50%, var(--wolf-yellow) 50%);
+}
+
+.tactical-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 16px;
+  height: 16px;
+  background: linear-gradient(315deg, transparent 50%, var(--border-tactical) 50%);
+}
+
+.card-top-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.card-hud-code {
+  font-family: var(--font-hud);
+  font-size: 0.7rem;
+  letter-spacing: 2px;
+  color: #718096;
+}
+
+.card-status-badge {
+  font-family: var(--font-hud);
+  font-size: 0.7rem;
+  letter-spacing: 1px;
+  padding: 3px 10px;
+  border-radius: 2px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.badge-normal {
+  background: rgba(0, 255, 136, 0.12);
+  color: var(--success-green);
+  border: 1px solid rgba(0, 255, 136, 0.35);
+}
+
+.badge-warning {
+  background: rgba(255, 208, 0, 0.15);
+  color: var(--wolf-yellow);
+  border: 1px solid rgba(255, 208, 0, 0.45);
+}
+
+.badge-danger {
+  background: rgba(255, 42, 77, 0.18);
+  color: var(--danger-red);
+  border: 1px solid rgba(255, 42, 77, 0.6);
+  animation: pulseAlarm 1.2s infinite;
+}
+
+/* Circular HUD Gauge Graphic */
+.gauge-wrapper {
+  position: relative;
+  width: 180px;
+  height: 180px;
+  margin: 0 auto 16px auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gauge-svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.gauge-bg-circle {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.06);
+  stroke-width: 10;
+}
+
+.gauge-fill-circle {
+  fill: none;
+  stroke: var(--wolf-yellow);
+  stroke-width: 10;
+  stroke-linecap: round;
+  stroke-dasharray: 440;
+  stroke-dashoffset: 440;
+  transition: stroke-dashoffset 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), stroke 0.3s ease;
+  filter: drop-shadow(0 0 6px var(--wolf-yellow));
+}
+
+/* Danger / Warning gauge colors */
+.gauge-fill-circle.danger {
+  stroke: var(--danger-red);
+  filter: drop-shadow(0 0 8px var(--danger-red));
+}
+
+.gauge-fill-circle.success {
+  stroke: var(--success-green);
+  filter: drop-shadow(0 0 8px var(--success-green));
+}
+
+.gauge-fill-circle.cyan {
+  stroke: var(--cyber-cyan);
+  filter: drop-shadow(0 0 8px var(--cyber-cyan));
+}
+
+/* Center readout inside circle */
+.gauge-center-content {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.gauge-main-val {
+  font-family: var(--font-hud);
+  font-size: 2.4rem;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1;
+}
+
+.gauge-unit {
+  font-size: 0.95rem;
+  color: var(--wolf-yellow);
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+.card-footer-info {
+  text-align: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding-top: 14px;
+}
+
+.card-title {
+  font-family: var(--font-hud);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: var(--wolf-yellow);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.card-subtext {
+  font-size: 0.88rem;
+  color: #a0aec0;
+}
+
+/* Extra Info Banner inside LED Card */
+.energy-tracker-box {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 10px;
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 4px;
+  padding: 6px;
+  font-size: 0.78rem;
+}
+
+.energy-item strong {
+  color: var(--wolf-yellow);
+  font-family: var(--font-hud);
+}
+
+/* Quick Telemetry & Classroom Radar Grid */
+.telemetry-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+  margin-bottom: 30px;
+}
+
+@media (max-width: 980px) {
+  .telemetry-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* AI Camera & YOLO Vision Status Card */
+.vision-status-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.vision-stream-mock {
+  position: relative;
+  height: 240px;
+  background: #08090d;
+  border: 1px solid var(--border-tactical);
+  border-radius: 4px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stream-radar-grid {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    radial-gradient(circle at center, rgba(255, 208, 0, 0.08) 0%, transparent 70%),
+    linear-gradient(rgba(255, 208, 0, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 208, 0, 0.05) 1px, transparent 1px);
+  background-size: 100% 100%, 30px 30px, 30px 30px;
+}
+
+.stream-sweep-radar {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, transparent 0deg, rgba(255, 208, 0, 0.25) 30deg, transparent 31deg);
+  animation: radarSweep 4s linear infinite;
+}
+
+.stream-hud-overlay {
+  position: absolute;
+  top: 12px;
+  left: 15px;
+  right: 15px;
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-hud);
+  font-size: 0.75rem;
+  color: var(--wolf-yellow);
+  letter-spacing: 1px;
+  pointer-events: none;
+}
+
+.stream-target-box {
+  position: absolute;
+  border: 2px solid var(--wolf-yellow);
+  border-radius: 2px;
+  background: rgba(255, 208, 0, 0.08);
+  box-shadow: 0 0 10px rgba(255, 208, 0, 0.4);
+  transition: all 0.5s ease;
+}
+
+.stream-target-box .target-tag {
+  position: absolute;
+  top: -18px;
+  left: 0;
+  background: var(--wolf-yellow);
+  color: #000;
+  font-family: var(--font-hud);
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 1px 4px;
+}
+
+/* System Parameters Checklist */
+.system-params-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.param-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(14, 17, 23, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 10px 14px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.param-item .param-name {
+  color: #a0aec0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.param-item .param-val {
+  font-family: var(--font-hud);
+  color: var(--wolf-yellow);
+  font-weight: 700;
+}
+
+/* ==============================================================================
+   MONITORING LOGS HISTORY TABLE (Every 3-Minutes Synced)
+   ============================================================================== */
+.table-controls-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.table-search-box {
+  position: relative;
+  flex: 1;
+  max-width: 320px;
+}
+
+.table-search-input {
+  width: 100%;
+  background: rgba(18, 21, 28, 0.9);
+  border: 1px solid var(--border-tactical);
+  color: #fff;
+  font-family: var(--font-tactical);
+  font-size: 0.95rem;
+  padding: 9px 14px 9px 36px;
+  border-radius: 4px;
+  outline: none;
+  transition: all var(--trans-fast);
+}
+
+.table-search-input:focus {
+  border-color: var(--wolf-yellow);
+  box-shadow: 0 0 15px rgba(255, 208, 0, 0.25);
+}
+
+.table-search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  stroke: #718096;
+}
+
+.table-filter-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.table-select {
+  background: rgba(18, 21, 28, 0.9);
+  border: 1px solid var(--border-tactical);
+  color: #cbd5e0;
+  font-family: var(--font-tactical);
+  font-size: 0.9rem;
+  padding: 8px 12px;
+  border-radius: 4px;
+  outline: none;
+  cursor: pointer;
+}
+
+/* Tactical Table Styling */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  background: var(--bg-card);
+  border: 1px solid var(--border-tactical);
+  border-radius: 4px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+.tactical-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.92rem;
+}
+
+.tactical-table th {
+  background: rgba(22, 26, 35, 0.95);
+  font-family: var(--font-hud);
+  font-size: 0.78rem;
+  letter-spacing: 1.5px;
+  color: var(--wolf-yellow);
+  text-transform: uppercase;
+  padding: 14px 18px;
+  border-bottom: 2px solid var(--border-tactical-bright);
+  white-space: nowrap;
+}
+
+.tactical-table td {
+  padding: 13px 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  color: #cbd5e0;
+  white-space: nowrap;
+}
+
+.tactical-table tbody tr {
+  transition: background var(--trans-fast);
+}
+
+.tactical-table tbody tr:hover {
+  background: rgba(255, 208, 0, 0.05);
+}
+
+.tactical-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.td-id {
+  font-family: var(--font-hud);
+  font-weight: 700;
+  color: #a0aec0;
+}
+
+.td-time {
+  font-family: monospace;
+  font-size: 0.85rem;
+  color: #718096;
+}
+
+.td-count {
+  font-family: var(--font-hud);
+  font-weight: 700;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.td-count span {
+  color: var(--wolf-yellow);
+}
+
+/* Table Pagination & Stats */
+.table-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 20px;
+  background: rgba(14, 17, 23, 0.95);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 0.85rem;
+  color: #718096;
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.page-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #cbd5e0;
+  padding: 4px 10px;
+  font-family: var(--font-hud);
+  font-size: 0.75rem;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all var(--trans-fast);
+}
+
+.page-btn:hover:not(:disabled) {
+  border-color: var(--wolf-yellow);
+  color: var(--wolf-yellow);
+}
+
+.page-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* ==============================================================================
+   ALERTS VIEW (Security & Safety Hazard Table)
+   ============================================================================== */
+.alerts-top-banner {
+  background: linear-gradient(90deg, rgba(255, 42, 77, 0.15) 0%, rgba(18, 21, 28, 0.8) 100%);
+  border: 1px solid rgba(255, 42, 77, 0.4);
+  border-left: 5px solid var(--danger-red);
+  border-radius: 4px;
+  padding: 18px 24px;
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.alerts-banner-info h3 {
+  font-family: var(--font-hud);
+  font-size: 1.15rem;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.alerts-banner-info h3 span {
+  color: var(--danger-red);
+}
+
+.alerts-banner-info p {
+  color: #a0aec0;
+  font-size: 0.9rem;
+  margin-top: 4px;
+}
+
+.alert-type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 3px;
+  font-family: var(--font-hud);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.alert-type-badge.critical {
+  background: rgba(255, 42, 77, 0.2);
+  color: var(--danger-red);
+  border: 1px solid var(--danger-red);
+  box-shadow: 0 0 10px rgba(255, 42, 77, 0.3);
+}
+
+.alert-type-badge.warning {
+  background: rgba(255, 149, 0, 0.2);
+  color: var(--warning-amber);
+  border: 1px solid var(--warning-amber);
+}
+
+.btn-resolve {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #e2e8f0;
+  font-family: var(--font-tactical);
+  font-size: 0.8rem;
+  padding: 4px 12px;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all var(--trans-fast);
+}
+
+.btn-resolve:hover {
+  background: rgba(0, 255, 136, 0.2);
+  border-color: var(--success-green);
+  color: var(--success-green);
+}
+
+/* ==============================================================================
+   ANALYTICS & CHARTS PANEL
+   ============================================================================== */
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(440px, 1fr));
+  gap: 24px;
+  margin-bottom: 30px;
+}
+
+@media (max-width: 600px) {
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.chart-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-tactical);
+  border-radius: 4px;
+  padding: 20px;
+}
+
+.chart-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding-bottom: 10px;
+}
+
+.chart-card-title {
+  font-family: var(--font-hud);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--wolf-yellow);
+  letter-spacing: 1px;
+}
+
+.chart-container-inner {
+  position: relative;
+  height: 250px;
+  width: 100%;
+}
+
+/* ==============================================================================
+   MODAL DIALOG (Firebase Settings & Simulator)
+   ============================================================================== */
+.tactical-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
+  z-index: 10000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.tactical-modal-backdrop.open {
+  display: flex;
+}
+
+.tactical-modal-window {
+  background: var(--bg-darker);
+  border: 1px solid var(--wolf-yellow);
+  border-radius: 4px;
+  width: 90%;
+  max-width: 560px;
+  box-shadow: 0 0 40px rgba(255, 208, 0, 0.25);
+  overflow: hidden;
+  position: relative;
+  animation: modalPop 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-header {
+  background: rgba(255, 208, 0, 0.1);
+  padding: 16px 22px;
+  border-bottom: 1px solid var(--border-tactical);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-title {
+  font-family: var(--font-hud);
+  font-size: 1.15rem;
+  color: var(--wolf-yellow);
+  letter-spacing: 2px;
+}
+
+.modal-close-btn {
+  background: none;
+  border: none;
+  color: #a0aec0;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: color var(--trans-fast);
+}
+
+.modal-close-btn:hover {
+  color: var(--danger-red);
+}
+
+.modal-body {
+  padding: 22px;
+}
+
+.modal-form-group {
+  margin-bottom: 16px;
+}
+
+.modal-form-label {
+  display: block;
+  font-family: var(--font-hud);
+  font-size: 0.75rem;
+  letter-spacing: 1px;
+  color: #cbd5e0;
+  margin-bottom: 6px;
+}
+
+.modal-input {
+  width: 100%;
+  background: rgba(18, 21, 28, 0.95);
+  border: 1px solid var(--border-tactical);
+  color: #fff;
+  font-family: monospace;
+  font-size: 0.9rem;
+  padding: 10px 14px;
+  border-radius: 4px;
+  outline: none;
+}
+
+.modal-input:focus {
+  border-color: var(--wolf-yellow);
+  box-shadow: 0 0 10px rgba(255, 208, 0, 0.3);
+}
+
+.modal-footer {
+  padding: 14px 22px;
+  background: rgba(10, 12, 16, 0.7);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+/* ==============================================================================
+   FOOTER
+   ============================================================================== */
+.tactical-footer {
+  margin-top: auto;
+  background: rgba(10, 12, 16, 0.95);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 16px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  color: #718096;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.footer-brand {
+  font-family: var(--font-hud);
+  color: var(--wolf-yellow);
+  font-weight: 700;
+  letter-spacing: 1.5px;
+}
+
+.footer-links {
+  display: flex;
+  gap: 20px;
+}
+
+.footer-links a {
+  color: #a0aec0;
+  text-decoration: none;
+  transition: color var(--trans-fast);
+}
+
+.footer-links a:hover {
+  color: var(--wolf-yellow);
+}
+
+/* ==============================================================================
+   MEDIA QUERIES (Mobile & Tablet Responsiveness)
+   ============================================================================== */
+@media (max-width: 768px) {
+  .top-header {
+    height: auto;
+    padding: 14px 18px;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .header-status-ticker {
+    display: none;
+  }
+  
+  .tactical-navbar {
+    padding: 10px 18px;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .nav-tabs-group {
+    justify-content: center;
+  }
+  
+  .nav-tab-btn {
+    flex: 1;
+    justify-content: center;
+    padding: 8px 12px;
+    font-size: 0.75rem;
+  }
+  
+  .main-viewport {
+    padding: 18px;
+  }
+  
+  .splash-title {
+    font-size: 2.2rem;
+    letter-spacing: 6px;
+  }
+}
